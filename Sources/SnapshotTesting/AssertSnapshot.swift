@@ -5,8 +5,14 @@ import XCTest
 ///     diffTool = "ksdiff"
 public var diffTool: String? = nil
 
+
+// MARK: Recording
+
+public var recordingEnv = Bool(ProcessInfo.processInfo.environment["SNAPSHOT_RECORDING"] ??
+"")
+
 /// Whether or not to record all new references.
-public var isRecording = false
+public var isRecording = recordingEnv ?? false
 
 /// Whether or not to record all new references.
 /// Due to a name clash in Xcode 12, this has been renamed to `isRecording`.
