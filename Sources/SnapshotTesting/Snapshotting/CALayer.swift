@@ -12,7 +12,7 @@ extension Snapshotting where Value == CALayer, Format == NSImage {
   /// - Parameters:
   ///   - precision: The percentage of pixels that must match.
   ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
-  public static func image(precision: Float, perceptualPrecision: Float = 1) -> Snapshotting {
+  public static func image(precision: Float, perceptualPrecision: Float = SnapshottingDefaults.perceptualPrecision) -> Snapshotting {
     return SimplySnapshotting.image(precision: precision, perceptualPrecision: perceptualPrecision).pullback { layer in
       let image = NSImage(size: layer.bounds.size)
       image.lockFocus()
@@ -40,7 +40,7 @@ extension Snapshotting where Value == CALayer, Format == UIImage {
   ///   - precision: The percentage of pixels that must match.
   ///   - perceptualPrecision: The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human eye.](http://zschuessler.github.io/DeltaE/learn/#toc-defining-delta-e)
   ///   - traits: A trait collection override.
-  public static func image(precision: Float = 1, perceptualPrecision: Float = 1, traits: UITraitCollection = .init())
+  public static func image(precision: Float = SnapshottingDefaults.precision, perceptualPrecision: Float = SnapshottingDefaults.perceptualPrecision, traits: UITraitCollection = .init())
     -> Snapshotting {
       return SimplySnapshotting.image(precision: precision, perceptualPrecision: perceptualPrecision, scale: traits.displayScale).pullback { layer in
         renderer(bounds: layer.bounds, for: traits).image { ctx in
