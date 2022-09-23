@@ -17,8 +17,8 @@ extension Snapshotting where Value == UIView, Format == UIImage {
   ///   - traits: A trait collection override.
   public static func image(
     drawHierarchyInKeyWindow: Bool = false,
-    precision: Float = 1,
-    perceptualPrecision: Float = 1,
+    precision: Float = SnapshottingDefaults.precision,
+    perceptualPrecision: Float = SnapshottingDefaults.perceptualPrecision,
     size: CGSize? = nil,
     traits: UITraitCollection = .init()
     )
