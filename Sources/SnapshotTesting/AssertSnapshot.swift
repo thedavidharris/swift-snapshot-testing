@@ -6,7 +6,7 @@ import XCTest
 public var diffTool: String? = nil
 
 /// Whether or not to record all new references.
-public var isRecording = false
+public var isRecording = ProcessInfo.processInfo.environment["SNAPSHOT_RECORDING"] == "YES"
 
 /// Whether or not to record all new references.
 /// Due to a name clash in Xcode 12, this has been renamed to `isRecording`.
@@ -234,7 +234,7 @@ public func verifySnapshot<Value, Format>(
         return "Couldn't snapshot value"
       }
       
-      guard !recording, fileManager.fileExists(atPath: snapshotFileUrl.path) else {
+      guard fileManager.fileExists(atPath: snapshotFileUrl.path) else {
         try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
         #if !os(Linux) && !os(Windows)
         if ProcessInfo.processInfo.environment.keys.contains("__XCODE_BUILT_PRODUCTS_DIR_PATHS") {
@@ -275,7 +275,22 @@ public func verifySnapshot<Value, Format>(
       #endif
 
       guard let (failure, attachments) = snapshotting.diffing.diff(reference, diffable) else {
+        if recording {
+          try fileManager.setAttributes([.modificationDate: Date()], ofItemAtPath: snapshotFileUrl.path)
+        }
         return nil
+      }
+      
+      guard !recording else {
+        try snapshotting.diffing.toData(diffable).write(to: snapshotFileUrl)
+        return """
+            Record mode is on. Differences were found vs the previously-recorded snapshot.
+            Turn record mode off and re-run "\(testName)" to test against the newly-recorded snapshot.
+            
+            open "\(snapshotFileUrl.path)"
+            
+            Recorded snapshot: …
+            """
       }
 
       let artifactsUrl = URL(
