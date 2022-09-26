@@ -11,5 +11,14 @@ public enum SnapshottingDefaults {
     /// The percentage of pixels that must match. Value between 0-1
     public static var precision: Float = 1
     /// The percentage a pixel must match the source pixel to be considered a match. [98-99% mimics the precision of the human
-    public static var perceptualPrecision: Float = 1
+    public static var perceptualPrecision: Float {
+        #if arch(x86_64)
+            // When executing on Intel (CI machines) lower the `defaultPerceptualPrecision` to 98% which avoids failing tests
+            // due to imperceivable differences in anti-aliasing, shadows, and blurs between Intel and Apple Silicon Macs.
+            return 0.98
+        #else
+            // The snapshots were generated on Apple Silicon Macs, so they match 100%.
+            return 1.0
+        #endif
+    }
 }
